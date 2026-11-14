@@ -27,18 +27,17 @@ export const getRazorpayInstance = () => {
  * signature = HMAC-SHA256(order_id + "|" + payment_id, secret)
  */
 export const verifyRazorpaySignature = (orderId, paymentId, signature) => {
-  const secret = process.env.RAZORPAY_KEY_SECRET || 'test_secret_for_internship_demo';
-  const body = `${orderId}|${paymentId}`;
-  const expectedSignature = crypto
-    .createHmac('sha256', secret)
-    .update(body.toString())
-    .digest('hex');
+  const secret = process.env.RAZORPAY_KEY_SECRET;
 
-  // If using live keys, verify exact HMAC
-  if (process.env.RAZORPAY_KEY_SECRET && process.env.RAZORPAY_KEY_SECRET !== 'YourRazorpaySecretKeyHere') {
+  if (secret && secret !== 'YourRazorpaySecretKeyHere') {
+    const body = `${orderId}|${paymentId}`;
+    const expectedSignature = crypto
+      .createHmac('sha256', secret)
+      .update(body)
+      .digest('hex');
+
     return expectedSignature === signature;
   }
 
-  // In local test/simulation mode without real keys, accept signature or test prefix
-  return signature === expectedSignature || signature?.startsWith('sim_sig_') || signature?.startsWith('razorpay_sig_');
+  return signature?.startsWith('sim_sig_') || signature?.startsWith('razorpay_sig_');
 };

@@ -13,7 +13,7 @@ const MONGO_URI =
   'mongodb://127.0.0.1:27017/pizza_delivery_db';
 
 const adminEmail = process.env.ADMIN_EMAIL || 'admin@pizzanest.com';
-const adminPassword = process.env.ADMIN_INITIAL_PASSWORD || 'AdminSecretPass123!';
+const adminPassword = process.env.ADMIN_INITIAL_PASSWORD;
 
 const initialUsers = [
   {
@@ -655,6 +655,15 @@ const initialCoupons = [
 
 export const seedDatabase = async () => {
   try {
+    if (
+      !adminPassword ||
+      adminPassword === 'replace-with-a-strong-password-before-seeding'
+    ) {
+      throw new Error(
+        'Set ADMIN_INITIAL_PASSWORD to a strong password before seeding.'
+      );
+    }
+
     console.log('[Seed] Connecting to MongoDB...');
     await mongoose.connect(MONGO_URI);
     console.log('[Seed] Connected to database.');
